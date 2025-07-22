@@ -6,6 +6,7 @@ Version: 2.4
 Author: Diamond Dave
 License: GPL2
 */
+<?php
 
 if (!defined('ABSPATH')) {
     exit;
@@ -106,7 +107,6 @@ function groupme_admin_page() {
                         const newUserForm = document.getElementById("newUserForm");
                         const updateNicknameForm = document.getElementById("updateNicknameForm");
 
-                        // Ensure only one form is open at a time
                         userForm.addEventListener("show.bs.collapse", function () {
                             newUserForm.classList.remove("show");
                             updateNicknameForm.classList.remove("show");
@@ -161,7 +161,6 @@ function groupme_enqueue_scripts() {
                 });
             });
 
-            // Character counter for Add/Remove Existing User form
             $("#new_nickname").on("input", function() {
                 var count = $(this).val().length;
                 $("#nickname_counter").text(count + "/50");
@@ -171,7 +170,6 @@ function groupme_enqueue_scripts() {
                 }
             });
 
-            // Character counter for Add New User by ID form
             $("#new_user_nickname").on("input", function() {
                 var count = $(this).val().length;
                 $("#new_user_nickname_counter").text(count + "/50");
@@ -553,7 +551,6 @@ function groupme_add_single_user_to_group($user_id, $nickname, $group_id, $acces
     $response_code = wp_remote_retrieve_response_code($response);
     $response_body = wp_remote_retrieve_body($response);
 
-    // Log API response to console
     $log_message = json_encode([
         'action' => 'add_single_user',
         'group_id' => $group_id,
@@ -615,7 +612,6 @@ function groupme_add_user_to_groups($user_id, $selected_groups, $access_token, $
         $response_code = wp_remote_retrieve_response_code($response);
         $response_body = wp_remote_retrieve_body($response);
 
-        // Log API response to console
         $log_message = json_encode([
             'action' => 'add_user_to_groups',
             'group_id' => $group_id,
@@ -718,7 +714,6 @@ function groupme_remove_user_from_groups($user_id, $selected_groups, $access_tok
             }
         }
 
-        // Re-add user with new nickname if provided and not remove_only
         if ($re_add) {
             $results[] = '<div class="alert alert-info">Re-adding user to group ' . $group_id . ' with new nickname "' . esc_html($new_nickname) . '".</div>';
             $results[] = groupme_add_user_to_groups($user_id, [$group_id], $access_token, $new_nickname);
@@ -730,13 +725,12 @@ function groupme_remove_user_from_groups($user_id, $selected_groups, $access_tok
 function groupme_update_user_nickname($user_id, $new_nickname, $selected_groups, $access_token) {
     $results = [];
 
-    // Validate nickname length
     if (strlen($new_nickname) < 1 || strlen($new_nickname) > 50) {
         return '<div class="alert alert-danger">Nickname must be between 1 and 50 characters.</div>';
     }
 
     foreach ($selected_groups as $group_id) {
-        // Fetch group details to get membership_id
+
         $group_url = "https://api.groupme.com/v3/groups/$group_id?token=$access_token";
         $group_response = wp_remote_get($group_url, [
             'timeout' => 15,
